@@ -28,14 +28,6 @@ intervals = [['sample', -500, 0], # pre-sample
              ['match', -500, 0], # late delay / pre-match
              ['match', 0, 500]] # match
 
-# frequency_band = [[lowcut, highcut]]
-frequency_band = [[4,8], # theta
-                  [7,12], # alpha
-                  [12,30], # beta
-                  [30,80], # gamma 
-                  [80,300]] 
-order = 3 # order of the filter
-
 #target_areas = [[area1, area2, ... ]] 
 target_areas = []
 # target_cortex = [[cortex1, cortex2, ...]] 
@@ -52,7 +44,6 @@ with open(path_out, 'w') as f:
     
 total_runs = 0
 for decode_for in decoders :
-    for lowcut, highcut in frequency_band :
         for sess_no in session :
             
             rinfo_path = raw_path +sess_no+'/session01/' + 'recording_info.mat'
@@ -70,8 +61,7 @@ for decode_for in decoders :
                         
                         print_str = '{}, {}, {}, {}, {}, {}'.format(
                              sess_no, decode_for, str(areas), 
-                             align_on+'_from'+str(from_time)+'_to'+str(to_time), 
-                             'low'+str(lowcut)+'high'+str(highcut)+'order'+str(order),
+                             align_on+'_from'+str(from_time)+'_to'+str(to_time),
                              str(cortex_list) )
 
                         
@@ -79,7 +69,6 @@ for decode_for in decoders :
                                   decode_for, 
                                   areas, 
                                   align_on, from_time, to_time,
-                                  lowcut, highcut, order,
                                   cortex_list,
                                   print_str]
                         
@@ -100,7 +89,6 @@ for decode_for in decoders :
                         print_str = '{}, {}, {}, {}, {}, {}'.format(
                              sess_no, decode_for, str(areas), 
                              align_on+'_from'+str(from_time)+'_to'+str(to_time), 
-                             'low'+str(lowcut)+'high'+str(highcut)+'order'+str(order),
                              str(cortex_list) )
 
                         
@@ -108,7 +96,6 @@ for decode_for in decoders :
                                   decode_for, 
                                   areas, 
                                   align_on, from_time, to_time,
-                                  lowcut, highcut, order,
                                   cortex_list,
                                   print_str]
                         with open(path_out, 'a') as f:
