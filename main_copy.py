@@ -203,33 +203,35 @@ DECAY = .999
 ########
 
 # train/test size, random split 
-train_size = .8
-test_size = .2
+# train_size = .8
+# test_size = .2
 seed = np.random.randint(1,10000)
+n_splits = 5
 
 
 # Auto-define number of classes
 classes = 2 if decode_for == 'resp' else 5
 
 # Load data and targets
-data, n_chans = io.get_subset_from_raw( sess_no, align_on, from_time, to_time,  
-                                       target_area, raw_path, elec_type,
-                                       return_nchans=True,
-                                       only_correct_trials=only_correct_trials)
+data = matnpy.get_subset_by_areas(sess_no, raw_path, 
+                         align_on, from_time, to_time, 
+                         target_area,
+                         only_correct_trials = only_correct_trials, renorm = False, elec_type = elec_type )
+n_chans = data.shape[1]
 
-targets = io.get_targets(decode_for, raw_path, elec_type, n_chans,
+targets = io.get_targets(decode_for, raw_path,n_chans, elec_type=elec_type,
                         only_correct_trials=only_correct_trials,
                         onehot=True)
 
-indices = np.arange(len(data))
-train, test, train_labels, test_labels, idx_train, idx_test = (
-        train_test_split(
-            data, 
-            targets, 
-            indices,
-            test_size=test_size, 
-            random_state=seed)
-        )
+# indices = np.arange(len(data))
+# train, test, train_labels, test_labels, idx_train, idx_test = (
+#         train_test_split(
+#             data, 
+#             targets, 
+#             indices,
+#             test_size=test_size, 
+#             random_state=seed)
+#         )
 
 # wavelet decomposition        
 depth_wav = 7
@@ -452,7 +454,7 @@ prediction = tf.argmax(y_conv, 1)
 
 ind_test = hlp.subset_test(test_labels, classes)
 
-kf = StratifiedKFold(n_splits=5,shuffle=True, random_state=seed)
+kf = StratifiedKFold(n_splits=n_splits,shuffle=True, random_state=seed)
 
 acc_training_list = []
 #acc_balanced_list = []
@@ -613,7 +615,7 @@ data = [ sess_no, interval, str(target_area), cortex_name, decode_for, only_corr
         mean_accuracy_per_class, error_bar, acc_training_list, 
         test.shape[0]+train.shape[0], train.shape[1],    
         confusion_matrix_list,
-        y_true_list, y_pred_list, seed, # idx_test_list,
+        y_true_list, y_pred_list, n_splits, seed, # idx_test_list,
         n_iterations, size_of_batches, learning_rate,
         l2_regularization_penalty, 
         amplify_input, q, keep_prob_train,
@@ -626,7 +628,7 @@ df = pd.DataFrame([data],
                         'mean_accuracy_per_class', 'error_bar', 'train_accuracy', 
                         'data_size', 'n_electrode' ,
                         'confusion_matrix',
-                         'y_true', 'y_pred', 'seed',
+                         'y_true', 'y_pred', 'n_splits','seed',
                         'iterations', 'batch_size', 'learning_rate', 
                         'l2 penalty', 
                         'amplify_input', 'q', 'keep_prob_train',
