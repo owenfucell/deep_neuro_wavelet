@@ -127,25 +127,22 @@ curr_params = eval(params[param_index-1])
 ##########
 # PARAMS #
 ##########
+
+[sess_no, 
+                                  decode_for, 
+                                  areas, 
+                                  align_on, from_time, to_time,
+                                  cortex_list,
+                                  print_str
 sess = '01' # '01' or '02'
 sess_no = curr_params[0]
-interval = curr_params[1]
+decode_for = curr_params[1]
 target_area = curr_params[2]
-decode_for = curr_params[3]
-
-cortex_name = curr_params[4]
-curr_str_to_print = curr_params[5] #test numéro X
+align_on ,from_time, to_time =curr_params[3], curr_params[4], curr_params[5]
+cortex_name = curr_params[6]
+curr_str_to_print = curr_params[7] #test numéro X
 
 mode = 'smooth'
-
-dico = {}
-dico['pre-sample'] = ('sample',-500-6,0+6)
-dico['sample'] = ('sample',0-6,500+6)
-dico['delay_start'] = ('sample',500-6,1000+6) #dico['delay-start'] = ('sample',500-6,1000+6)
-dico['delay-end'] = ('match',-500-6,0+6)
-dico['match'] = ('match',0-6,500+6)
-align_on ,from_time, to_time = dico[interval]
-
 elec_type = 'grid'  # any one of single|grid|average
 
 #only_correct_trials = False  
@@ -163,7 +160,7 @@ tinfo_path = raw_path + 'trial_info.mat'
 
 
 
-#PARAMS
+#CNN PARAMS
 
 n_layers = 6
 depth_wav = 7
