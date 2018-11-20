@@ -1,4 +1,4 @@
-# deep_neuro
+# deep_neuro_wavelet
 Continuation of the work of 
 [Jannes Schafer](https://github.com/schanso/deep_neuro). 
 
