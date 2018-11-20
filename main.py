@@ -128,13 +128,6 @@ curr_params = eval(params[param_index-1])
 ##########
 # PARAMS #
 ##########
-
-[sess_no, 
-                                  decode_for, 
-                                  areas, 
-                                  align_on, from_time, to_time,
-                                  cortex_list,
-                                  print_str
 sess = '01' # '01' or '02'
 sess_no = curr_params[0]
 decode_for = curr_params[1]
