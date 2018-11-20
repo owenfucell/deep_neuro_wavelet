@@ -100,15 +100,14 @@ for decode_for in decoders :
     # keep only these columns
     result = result[ ['session', 'decode_for', 'only_correct_trials',
                       'areas', 'cortex', 'elec_type',
-                      'frequency_band',
                       'interval',
-                      'recall_macro', 'error_bar_th', 'error_bar_emp',
+                      'mean_accuracy_per_class', 'error_bar',
                       'seed', 'n_splits',
                       'n_test_per_class', 'data_size', 'n_chans', 'window_size'] ]
     
     ## ADD pval and sign
     
-    result['pval'] = result.apply(lambda row: pval(row.n_test_per_class, row.recall_macro, classes), axis=1)
+    result['pval'] = result.apply(lambda row: pval(row.n_test_per_class, row.mean_accuracy_per_class, classes), axis=1)
     result['sign'] = result.apply(lambda row : sign(row.pval), axis=1)
     
     # Save file
