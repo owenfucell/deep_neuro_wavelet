@@ -2,18 +2,17 @@
 Continuation of the work of 
 [Jannes Schafer](https://github.com/schanso/deep_neuro). 
 
-**deep_neuro**  explores the Gray dataset using a
+**deep_neuro_wavelet**  explores the Gray dataset using a
 [convolutional neural network](http://yann.lecun.com/exdb/publis/pdf/lecun-99.pdf) 
 trying to predict either stimulus class or response type from different brain 
-regions, from different frequency band and at different points in time.
-It also transforms the raw data from MATLAB to NumPy-ready and applies the usual
-pre-processing steps as well as dealing with the analysis and visualization of the results 
+regions at different points in time.
+It also transforms the raw data from MATLAB to NumPy-ready and applies the wavelet decomposiyion steps as well as dealing with the analysis and visualization of the results 
 
 
 ### Installation
 To get started, create a project directory using `mkdir my_project/` and change
 into it (`cd my_project/`). Then clone this repository using 
-`git clone https://github.com/rnoyelle/deep_neuro.git`. Once cloned, change into 
+`git clone https://github.com/rnoyelle/deep_neuro_wavelet.git`. Once cloned, change into 
 the directory (`cd deep_neuro/`) and source the environment generator file:
 
 `. generate_environment.sh`
@@ -56,13 +55,6 @@ it cuts every trial of a given session into five intervals:
 * delay (500 ms after stimulus offset)
 * pre-match (500 ms before match onset)
 * match (500 ms after match onset)
-
-it filters every trial of a given session into five frequency band:
-* 4-8 Hz (theta)
-* 7-12 Hz (alpha)
-* 12-30 Hz (beta)
-* 30-80 Hz (gamma)
-* 80-300 Hz
 
 It selects channels into 6 groups :
 * Visual cortex
