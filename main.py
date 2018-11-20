@@ -10,11 +10,12 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from sklearn.model_selection import train_test_split
+#from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 import pywt
 
-import lib.cnn.io as io
+import lib.matnpy.matnpyio as io
+import lib.matnpy.matnpy as matnpy
 import lib.cnn.helpers as hlp
 import lib.cnn.cnn as cnn
 #from lib.cnn_1.confusion_matrix import plot_confusion_matrix
@@ -452,7 +453,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 prediction = tf.argmax(y_conv, 1)
 
 
-ind_test = hlp.subset_test(test_labels, classes)
+#ind_test = hlp.subset_test(test_labels, classes)
 
 kf = StratifiedKFold(n_splits=n_splits,shuffle=True, random_state=seed)
 
