@@ -6,7 +6,7 @@ Continuation of the work of
 [convolutional neural network](http://yann.lecun.com/exdb/publis/pdf/lecun-99.pdf) 
 trying to predict either stimulus class or response type from different brain 
 regions at different points in time.
-It also transforms the raw data from MATLAB to NumPy-ready and applies the wavelet decomposiyion steps as well as dealing with the analysis and visualization of the results 
+It also transforms the raw data from MATLAB to NumPy-ready and applies the wavelet decomposition as well as dealing with the analysis and visualization of the results 
 
 
 ### Installation
