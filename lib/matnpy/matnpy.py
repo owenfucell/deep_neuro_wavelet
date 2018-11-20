@@ -9,7 +9,7 @@ from . import preprocess as pp#import preprocess as pp
 
 
 
-def get_preprocessed_from_raw(sess_no, raw_path, align_on, from_time, to_time, lowcut, highcut, order) :
+def get_preprocessed_from_raw(sess_no, raw_path, align_on, from_time, to_time) :
     """Gets raw data and preprocess them.
     
     Args:
@@ -18,9 +18,6 @@ def get_preprocessed_from_raw(sess_no, raw_path, align_on, from_time, to_time, l
         align_on: A str. One of 'sample' , 'match'.
         from_time : A float. in ms
         to_time :  A float. in ms. cuts the trial between from_time and to_time. 0 correspond at the onset time of align_on.
-        lowcut : A float. in Hz
-        highcut : A float. in Hz. filters the trials between lowcut and highcu
-        order : A float. order of the frequency filter.
         
         
     Returns:
@@ -84,11 +81,7 @@ def get_preprocessed_from_raw(sess_no, raw_path, align_on, from_time, to_time, l
                                 onset,
                                 start=from_time,
                                 length=trial_length)
-            temp = pp.butter_bandpass_filter(temp,
-                                            lowcut,
-                                            highcut,
-                                            srate,
-                                            order)
+            
             if temp.shape[1] == trial_length:  # drop trials shorter than length
                 filtered[counter] = temp
             counter += 1
@@ -104,9 +97,7 @@ def get_preprocessed_from_raw(sess_no, raw_path, align_on, from_time, to_time, l
 
 def get_subset_by_cortex(sess_no, raw_path, 
                          align_on, from_time, to_time,
-                         lowcut, highcut, 
                          cortex,
-                         epsillon = 100, order = 3,
                          only_correct_trials = True, renorm = True ):
     """Gets raw data and preprocess them. Select data trials and channels according to inputs 
     
@@ -116,13 +107,9 @@ def get_subset_by_cortex(sess_no, raw_path,
         align_on: A str. One of 'sample' , 'match'.
         from_time : A float. in ms
         to_time :  A float. in ms. cuts the trial between from_time and to_time. 0 correspond at the onset time of align_on.
-        lowcut : A float. in Hz
-        highcut : A float. in Hz. filters the trials between lowcut and highcu
-        order : A float. order of the frequency filter.
         cortex : A str. One of 'Visual', 'Parietal', 'Prefrontal', 'Motor', 'Somatosensory'
-        epsillon : A float. Load a little bit more in time to prevent zero padding of the frequency filters. then the excess is cut before return.
         only_correct_trials : A boolean. if True, only trials where the monkey succeed the task are selected.
-        renorm : A boolean. If True, data are normed after time cut and frequency filters        
+        renorm : A boolean. If True, data are normed after time cut      
         
     Returns:
         Ndarray of filtered data. 
@@ -132,8 +119,7 @@ def get_subset_by_cortex(sess_no, raw_path,
     
     # get all data
     data_filtered = get_preprocessed_from_raw(sess_no, raw_path, 
-                                                               align_on, from_time - epsillon, to_time + epsillon, 
-                                                               lowcut, highcut, order)
+                                                               align_on, from_time, to_time )
         
     # don't keep missing data // keep only_correct_trials if True
     
@@ -167,7 +153,7 @@ def get_subset_by_cortex(sess_no, raw_path,
     
     elec = s[s['cortex'] == cortex]['index']
     
-    data_filtered = data_filtered[:, elec, epsillon : -epsillon ]
+    data_filtered = data_filtered[:, elec, :]
 
                                     
     
@@ -189,11 +175,9 @@ def get_subset_by_cortex(sess_no, raw_path,
     return( data_filtered )
 
 def get_subset_by_areas(sess_no, raw_path, 
-                         align_on, from_time, to_time,
-                         lowcut, highcut, 
+                         align_on, from_time, to_time, 
                          target_areas,
-                         epsillon = 100, order = 3,
-                         only_correct_trials = True, renorm = True, elec_type = 'grid' ):
+                         only_correct_trials = True, renorm = False, elec_type = 'grid' ):
 
     """Gets raw data and preprocess them. Select data trials and channels according to inputs 
     
@@ -203,14 +187,10 @@ def get_subset_by_areas(sess_no, raw_path,
         align_on: A str. One of 'sample' , 'match'.
         from_time : A float. in ms
         to_time :  A float. in ms. cuts the trial between from_time and to_time. 0 correspond at the onset time of align_on.
-        lowcut : A float. in Hz
-        highcut : A float. in Hz. filters the trials between lowcut and highcu
-        order : A float. order of the frequency filter.
         target_areas : A list. list of areas to select.
         elec_type : A str. One of 'single' (use all electrodes within area as single trials), 
                                   'grid' (use whole electrode grid), 
                                   'average' (mean over all electrodes in area).
-        epsillon : A float. Load a little bit more in time to prevent zero padding of the frequency filters. then the excess is cut before return.
         only_correct_trials : A boolean. if True, only trials where the monkey succeed the task are selected.
         renorm : A boolean. If True, data are normed after time cut and frequency filters        
         
@@ -222,8 +202,7 @@ def get_subset_by_areas(sess_no, raw_path,
     
     # get all data
     data_filtered = get_preprocessed_from_raw(sess_no, raw_path, 
-                                                               align_on, from_time - epsillon, to_time + epsillon, 
-                                                               lowcut, highcut, order)
+                                                               align_on, from_time, to_time)
         
     # don't keep missing data // keep only_correct_trials if True
     
@@ -248,11 +227,7 @@ def get_subset_by_areas(sess_no, raw_path,
         if area in target_areas:
             idx.append(count)         
             
-    if epsillon != 0 :    
-        data_filtered = data_filtered[:, idx, epsillon : -epsillon ]
-    else:
-        data_filtered = data_filtered[:, idx, :]
-                                      
+    data_filtered = data_filtered[:, idx, :]               
     
 
     ## change type 
