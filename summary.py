@@ -62,9 +62,8 @@ for decode_for in decoders :
     # columns to keep
     result = result[ ['session', 'decode_for', 'only_correct_trials',
                            'areas', 'cortex', 'elec_type',
-                           'frequency_band',
                            'interval',
-                           'recall_macro', 'error_bar_th', 'error_bar_emp', 'n_test_per_class',
+                           'mean_accuracy_per_class', 'error_bar', 'n_test_per_class',
                            'recall_macro_train_per_fold', 'recall_macro_test_per_fold',
                            'seed', 'n_splits',
                            'data_size', 'n_chans', 'window_size',
