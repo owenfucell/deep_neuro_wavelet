@@ -22,11 +22,11 @@ decoders = ['stim', # decode the class of the stimulus
             'resp'] # decode the response of the monkey (succes or fail)
 
 # intervals = [ [align_on, from_time, to_time] ]
-intervals = [['sample', -500, 0], # pre-sample
-             ['sample', 0, 500], # sample
-             ['sample', 500, 1000], # early delay
-             ['match', -500, 0], # late delay / pre-match
-             ['match', 0, 500]] # match
+intervals = [['sample', -506, 6], # pre-sample
+             ['sample', -6, 506], # sample
+             ['sample', 494, 1006], # early delay
+             ['match', -506, 6], # late delay / pre-match
+             ['match', -6, 506]] # match
 
 #target_areas = [[area1, area2, ... ]] 
 target_areas = []
