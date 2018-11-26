@@ -112,7 +112,7 @@ def l2_loss(weights, l2_regularization_penalty, y_, y_conv, name):
 
 param_index = int(sys.argv[1])
 base_path = '/home/rudy.noyelle/wavelet/'
-file = base_path + 'scripts/_params/training_all.txt'
+file = base_path + 'scripts/_params/training.txt'
 # Get current params from file
 with open(file, 'rb') as f:
     params = np.loadtxt(f, dtype='object', delimiter='\n')
@@ -142,8 +142,8 @@ else:
 
 
 #data path
-#raw_path = (base_path + 'data/raw/'+ sess_no +'/session01/')
-raw_path = ('/home/rudy.noyelle/wavelet/'+ 'data/raw/'+ sess_no +'/session01/')
+raw_path = (base_path + 'data/raw/'+ sess_no +'/session01/')
+#raw_path = ('/home/rudy.noyelle/wavelet/'+ 'data/raw/'+ sess_no +'/session01/')
 rinfo_path = raw_path + 'recording_info.mat'
 tinfo_path = raw_path + 'trial_info.mat'
 
