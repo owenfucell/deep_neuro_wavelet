@@ -106,10 +106,6 @@ def l2_loss(weights, l2_regularization_penalty, y_, y_conv, name):
 
 
 
-##########
-## PATHS #
-##########
-
 #########
 # PATHS #
 #########
@@ -487,23 +483,22 @@ for train_index, test_index in kf.split(data, np.argmax(targets[:,:], axis=1)):
             ind_train = hlp.subset_train(train_labels, classes, size_of_batches)
 
             ## Every n iterations, print training accuracy
-            #if i % 50 == 0:
-                #train_accuracy = accuracy.eval(feed_dict={
-                    #x_1: cd_train[1][ind_train,:,:],
-                    #x_2: cd_train[2][ind_train,:,:],
-                    #x_3: cd_train[3][ind_train,:,:],
-                    #x_4: cd_train[4][ind_train,:,:],
-                    #x_5: cd_train[5][ind_train,:,:],
-                    #x_6: cd_train[6][ind_train,:,:],
-                    #y_: train_labels[ind_train,:],
-                    #keep_prob: 1.0
-                    #})
-                #print('step %d, training accuracy: %g' % (
-                        #i, train_accuracy))
+            if i % 50 == 0:
+                train_accuracy = accuracy.eval(feed_dict={
+                    x_1: cd_train[1][ind_train,:,:],
+                    x_2: cd_train[2][ind_train,:,:],
+                    x_3: cd_train[3][ind_train,:,:],
+                    x_4: cd_train[4][ind_train,:,:],
+                    x_5: cd_train[5][ind_train,:,:],
+                    x_6: cd_train[6][ind_train,:,:],
+                    y_: train_labels[ind_train,:],
+                    keep_prob: 1.0
+                    })
+                print('step %d, training accuracy: %g' % (
+                        i, train_accuracy))
 
             # Training
-    #         curr_x = train[ind_train,:,:]
-    #         curr_y = train_labels[ind_train,:]
+
             train_step.run(feed_dict={
                     x_1: cd_train[1][ind_train,:,:],
                     x_2: cd_train[2][ind_train,:,:],
@@ -517,7 +512,7 @@ for train_index, test_index in kf.split(data, np.argmax(targets[:,:], axis=1)):
 
         ### TRAINING ACCURACY last step
 
-        train_accuracy = accuracy.eval(feed_dict={
+        y_pred = prediction.eval(feed_dict={
                         x_1: cd_train[1][:,:,:],
                         x_2: cd_train[2][:,:,:],
                         x_3: cd_train[3][:,:,:],
@@ -527,32 +522,14 @@ for train_index, test_index in kf.split(data, np.argmax(targets[:,:], axis=1)):
                         y_: train_labels[:,:],
                         keep_prob: 1.0
                         })
-        acc_training_list.append(train_accuracy)
-
+        # get mean of accuracy per class
+        acc_train, error_bar = mean_accuracy_per_class(np.argmax(train_labels[:,:],1), y_pred)
+        # append to list in order to save it
+        mean_per_class_accuracy_train_per_fold.append(acc_train)
 
         ### TEST ACCURACY ###
 
         # Print test accuracy on balanced test base
-        #     curr_x_test = test[ind_test,:,:]
-        #     curr_y_test = test_labels[ind_test,:]
-        #acc_cnn = accuracy.eval(feed_dict={
-                #x_1: cd_test[1][ind_test,:,:],
-                #x_2: cd_test[2][ind_test,:,:],
-                #x_3: cd_test[3][ind_test,:,:],
-                #x_4: cd_test[4][ind_test,:,:],
-                #x_5: cd_test[5][ind_test,:,:],
-                #x_6: cd_test[6][ind_test,:,:],
-                #y_: test_labels[ind_test,:],
-                #keep_prob: 1.0
-                #})
-
-        #print('\n')
-        #print('test accuracy: CNN %g ' % (acc_cnn) )
-
-        #acc_balanced_list.append(acc_cnn)
-        #n_test_list.append(len(ind_test))
-
-
         y_pred =  prediction.eval(feed_dict={
             x_1: cd_test[1][:,:,:],
             x_2: cd_test[2][:,:,:],
@@ -563,17 +540,21 @@ for train_index, test_index in kf.split(data, np.argmax(targets[:,:], axis=1)):
             y_: test_labels[:,:],
             keep_prob: 1.0
             })
+        
+        acc, error_bar = cnn.mean_accuracy_per_class(np.argmax(test_labels[:,:],1), y_pred)
+        print('mean acc : %g +-' (acc, error_bar))         
+        
 
         table_confusion = confusion_matrix(
-        np.argmax(test_labels[:,:],1),
-        y_pred)
+            np.argmax(test_labels[:,:],1),
+            y_pred)
 
         # append
         y_pred_list.append( list(y_pred) )
         y_true_list.append( list( np.argmax(test_labels[:,:],1)) )
         confusion_matrix_list.append(list(table_confusion)) 
         
-        #idx_test_list.append(idx_test)
+
 
 
 cnf = np.array(confusion_matrix_list)
@@ -602,37 +583,56 @@ error_bar = np.sqrt(np.sum( np.array(error_bar_per_fold) **2 ))/len(error_bar_pe
 
 #acc_mean =  np.mean(acc_balanced_list)
 
-channels = [in_1, out_1, in_2, out_2, in_3, out_3, in_4, out_4, in_5, out_5, in_6, out_6]
+channels_in = [in_1, in_2, in_3, in_4, in_5, in_6]
+channels_out = [out_1, out_2, out_3, out_4, out_5, out_6]
 
-data = [ sess_no, interval, str(target_area), cortex_name, decode_for, only_correct_trials,
-        mean_accuracy_per_class, error_bar, acc_training_list, 
-        test.shape[0]+train.shape[0], train.shape[1],    
-        confusion_matrix_list,
-        y_true_list, y_pred_list, n_splits, seed, # idx_test_list,
-        n_iterations, size_of_batches, learning_rate,
-        l2_regularization_penalty, 
-        amplify_input, q, keep_prob_train,
-        str(patch_dim), str(patch_dim5), str(patch_dim6),  str(pool_dim), 
-        str(channels), fc_units, dist,
-        batch_norm, nonlin, normalized_weights]
+time = str(datetime.datetime.now())
+result = [str(sess_no), decode_for, only_correct_trials,
+          str(target_area), cortex_name, elec_type,
+          interval,
+          mean_accuracy_per_class, error_bar, list(np.sum(targets, axis=0)), #### !!!!!
+          mean_per_class_accuracy_train_per_fold, mean_accuracy_per_class_per_fold, # !!!!
+          seed, n_splits,
+          data.shape[0], n_chans, to_time - from_time,
+          y_true_list, y_pred_list, ## !!!!!!!
+          amplify_input, q,
+          n_layers,
+          str(patch_dim), str(patch_dim5), str(patch_dim6),  str(pool_dim), 
+          str(channels_in), str(channels_out), ### !!!! 
+          nonlin, fc_units,
+          n_iterations, size_of_batches, learning_rate,
+          dist, normalized_weights,
+          batch_norm,
+          keep_prob_train,
+          l2_regularization_penalty,
+          time]
 
-df = pd.DataFrame([data],
-                columns=['session', 'interval', 'area', 'cortex', 'decode_for','only_correct_trials',
-                        'mean_accuracy_per_class', 'error_bar', 'train_accuracy', 
-                        'data_size', 'n_electrode' ,
-                        'confusion_matrix',
-                         'y_true', 'y_pred', 'n_splits','seed',
-                        'iterations', 'batch_size', 'learning_rate', 
-                        'l2 penalty', 
-                        'amplify_input', 'q', 'keep_prob_train',
-                        'patch_dim', 'patchl_dim5', 'patch_dim6', 'pool_dim',
-                        'channels', 'fc_units', 'dist',
-                        'batch_norm', 'nonlinearity', 'normalized_weights'],
+df = pd.DataFrame([result],
+                columns=['session', 'decode_for', 'only_correct_trials',
+                         'areas', 'cortex', 'elec_type',
+                         'interval',
+                         'mean_per_class_accuracy', 'error_bar', 'n_test_per_class',
+                         'mean_per_class_accuracy_train_per_fold', 'mean_per_class_accuracy_test_per_fold',
+                         'seed', 'n_splits',
+                         'data_size', 'n_chans', 'window_size',
+                         'y_true_per_fold', 'y_pred_per_fold',
+                         'amplify_input', 'q',
+                         'n_layers', 'patch_dim', 'patchl_dim5', 'patch_dim6', 'pool_dim',
+                         'channels_in', 'channels_out', 
+                         'nonlin', 'fc_units',
+                         'n_iterations', 'size_of_batches', 'learning_rate',
+                         'weights_dist', 'normalized_weights',
+                         'batch_norm',
+                         'keep_prob_train', 
+                         'l2_regularization_penalty',
+                         'time'],
                 index=[0])
 
 
+
 # Save to file
-file_name = base_path + 'results/training_per_session/' 'training_wavelet_' + 'sess' + str(sess_no) + 'decode_for' + decode_for + '_.csv'
+file_name = (base_path + 'results/training/'
+             + sess_no + '_training_'+decode_for+'.csv')
 file_exists = os.path.isfile(file_name)
 if file_exists :
     with open(file_name, 'a') as f:
@@ -642,15 +642,7 @@ else:
         df.to_csv(f, mode ='w', index=False, header=True)
         
         
-## Save to file 
-#file_name = base_path + 'results/training_all_session/' + 'training_wavelet_' + 'sess_all_' + 'decode_for_' + decode_for + '.csv'
-#file_exists = os.path.isfile(file_name)
-#if file_exists :
-    #with open(file_name, 'a') as f:
-        #df.to_csv(f, mode ='a', index=False, header=False)
-#else:
-    #with open(file_name, 'w') as f:
-        #df.to_csv(f, mode ='w', index=False, header=True)
+
 
             
             
