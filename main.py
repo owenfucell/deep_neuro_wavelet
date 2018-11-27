@@ -590,11 +590,11 @@ time = str(datetime.datetime.now())
 result = [str(sess_no), decode_for, only_correct_trials,
           str(target_area), cortex_name, elec_type,
           interval,
-          mean_accuracy_per_class, error_bar, list(np.sum(targets, axis=0)), #### !!!!!
-          mean_per_class_accuracy_train_per_fold, mean_accuracy_per_class_per_fold, # !!!!
+          mean_accuracy_per_class, error_bar, list(np.sum(targets, axis=0)),
+          mean_per_class_accuracy_train_per_fold, mean_accuracy_per_class_per_fold,
           seed, n_splits,
           data.shape[0], n_chans, to_time - from_time,
-          y_true_list, y_pred_list, ## !!!!!!!
+          y_true_list, y_pred_list, 
           amplify_input, q,
           n_layers,
           str(patch_dim), str(patch_dim5), str(patch_dim6),  str(pool_dim), 
